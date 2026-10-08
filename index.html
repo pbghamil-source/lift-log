@@ -44,7 +44,7 @@ input,textarea,select{font:inherit;padding:11px;border:1.5px solid var(--line);b
  <div class="plans">
   <button class="plan a" data-p="A"><div class="ic">A</div><div><b>Plan A</b><span id="pa"></span></div></button>
   <button class="plan b" data-p="B"><div class="ic">B</div><div><b>Plan B</b><span id="pb"></span></div></button>
-  <button class="plan c" data-p="C"><div class="ic">C</div><div><b>Plan C · Cardio</b>Bike, treadmill walk</div></button>
+  <button class="plan c" data-p="C"><div class="ic">C</div><div><b>Plan C · Cardio</b>Bike, treadmill walk, walk, run</div></button>
  </div>
  <div class="row"><span class="cond muted">DATE</span><input type="date" id="wdate" style="flex:1"><button class="btn" id="today">Today</button></div>
  <div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn" id="clear">Clear entries</button></div>
@@ -95,7 +95,7 @@ const EX={
 };
 const PLANS={A:{main:["legpress","chest","pulldown","legcurl","shpress","abduct","plank"],opt:["fly","calf","facepull","pallof","farmer"]},
  B:{main:["legpress","row","incline","backext","legext","calf"],opt:["facepull"]}};
-const CARDIO=[{id:"bike",n:"Bike",lv:"Level"},{id:"tread",n:"Treadmill walk",lv:"Speed (mph)"}];
+const CARDIO=[{id:"bike",n:"Bike",lv:"Level"},{id:"tread",n:"Treadmill walk",lv:"Speed (mph)"},{id:"walk",n:"Walk",lv:"Distance (mi)"},{id:"run",n:"Run",lv:"Distance (mi) or speed",warn:"Hip resurfacing: get your surgeon's OK before running. Start with short walk/jog intervals on a treadmill; stop for any hip or groin pain."}];
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const KEY="liftlog_v1";
 function seed(){const W=(id,date,plan,entries)=>({id,date,plan,entries});const E=(ex,name,sets,note)=>({ex,name,sets:sets.map(([w,r])=>({w,r})),note:note||""});
@@ -136,7 +136,7 @@ function exCard(id,opt){const d=EX[id],l=lastFor(id),dr=draft[id]||(draft[id]={s
  <input style="margin-top:8px" data-f="note" placeholder="Note (how it felt, joints...)" value="${esc(dr.note)}">
  <button class="link" data-a="cue">Form cue ▾</button><div class="cue"><b>Setup:</b> ${d.set}<br><b>Cue:</b> ${d.cue}</div></div>`}
 function cardioCard(c){const l=lastFor(c.id),dr=draft[c.id]||(draft[c.id]={min:"",level:"",incline:"",hr:"",note:""});
- return`<div class="card" data-cx="${c.id}"><h3>${c.n}</h3><div class="muted" style="font-size:15px">${l?`Last (${fmt(l.w.date)}): ${setsTxt(l.e)}`:"No log yet"}</div>
+ return`<div class="card" data-cx="${c.id}"><h3>${c.n}</h3>${c.warn?`<div class="warn">${c.warn}</div>`:""}<div class="muted" style="font-size:15px">${l?`Last (${fmt(l.w.date)}): ${setsTxt(l.e)}`:"No log yet"}</div>
  <div class="set" style="grid-template-columns:1fr 1fr"><input type="number" data-f="min" placeholder="Minutes" value="${dr.min}"><input data-f="level" placeholder="${c.lv}" value="${esc(dr.level)}"></div>
  <div class="set" style="grid-template-columns:1fr 1fr"><input type="number" data-f="incline" placeholder="Incline %" value="${dr.incline}"><input type="number" data-f="hr" placeholder="Avg HR bpm" value="${dr.hr}"></div>
  <input data-f="note" placeholder="Note" value="${esc(dr.note)}"></div>`}
@@ -146,7 +146,7 @@ function renderEx(){const L=$("#exlist");if(!plan){L.innerHTML='<p class="muted"
  count()}
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const filled=id=>{const d=draft[id];if(!d)return 0;return d.sets?d.sets.some(s=>s.r!==""):d.min!==""};
-function count(){const ids=plan==="C"?CARDIO.map(c=>c.id):plan?PLANS[plan].main.concat(PLANS[plan].opt):[];const m=plan==="C"?ids.length:plan?PLANS[plan].main.length:0;const n=ids.filter(filled).length;
+function count(){const ids=plan==="C"?CARDIO.map(c=>c.id):plan?PLANS[plan].main.concat(PLANS[plan].opt):[];const m=plan==="C"?Math.max(1,ids.filter(filled).length):plan?PLANS[plan].main.length:0;const n=ids.filter(filled).length;
  $("#count").textContent=`${n} of ${m} exercises logged`;$("#save").disabled=!n}
 $("#exlist").addEventListener("input",e=>{const t=e.target,c=t.closest("[data-ex],[data-cx]");if(!c)return;const id=c.dataset.ex||c.dataset.cx,d=draft[id],f=t.dataset.f;
  if(t.dataset.i!=null)d.sets[+t.dataset.i][f]=t.value;else d[f]=t.value;count()});
