@@ -160,7 +160,7 @@ $("#today").onclick=()=>$("#wdate").value=today();
 $("#clear").onclick=()=>{if(confirm("Clear all entries on this screen?")){draft={};renderEx()}};
 $("#save").onclick=()=>{const date=$("#wdate").value||today();const entries=[];
  if(plan==="C")CARDIO.forEach(c=>{if(filled(c.id)){const d=draft[c.id];entries.push({ex:c.id,name:c.n,cardio:{min:d.min,level:d.level,incline:d.incline,hr:d.hr},note:d.note})}});
- else PLANS[plan].main.concat(PLANS[plan].opt).forEach(id=>{if(filled(id)){const d=draft[id];entries.push({ex:id,name:EX[id].n,sets:d.sets.filter(s=>s.r!=="").map(s=>({w:s.w===""?"":+s.w,r:+s.r})),note:d.note})}});
+ else PLANS[plan].main.concat(PLANS[plan].opt).forEach(id=>{if(filled(id)){const d=draft[id];entries.push({ex:id,name:EX[id].n,sets:(()=>{const l=lastFor(id);const ls=l&&l.e.sets||[];return d.sets.map((s,i)=>({s,i})).filter(o=>o.s.r!=="").map(({s,i})=>{let w=s.w;if(w===""){const p=ls[Math.min(i,ls.length-1)];w=p&&p.w!==""&&p.w!=null?p.w:""}return{w:w===""?"":+w,r:+s.r}})})(),note:d.note})}});
  DB.workouts.push({id:"w"+Date.now(),ts:Date.now(),date,plan,entries});store();draft={};plan=null;renderAll();alert("Workout saved 💪");scrollTo(0,0)};
 function renderHist(){const ws=sorted();$("#histlist").innerHTML=ws.length?ws.map(w=>`<details class="card hist"><summary><div><span class="tag t${w.plan.toLowerCase()}">${w.plan==="C"?"C · Cardio":"Plan "+w.plan}</span> <b>${fmtY(w.date)}</b></div><span class="muted">${w.entries.length} ▾</span></summary>
  ${w.entries.map(e=>`<div class="hx"><b>${esc(e.name)}</b><br>${setsTxt(e,e.ex)}${e.note?`<br><i class="muted">${esc(e.note)}</i>`:""}</div>`).join("")}
