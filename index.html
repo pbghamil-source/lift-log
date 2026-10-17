@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Lift Log</title>
 <style>
-:root{--a:#2350d0;--b:#c8342b;--c:#9a6a00;--bg:#eef0f4;--card:#fff;--ink:#16181d;--mute:#5d6470;--line:#d5d9e0}
+:root{--a:#2350d0;--b:#c8342b;--c:#9a6a00;--t:#1d7a4a;--bg:#eef0f4;--card:#fff;--ink:#16181d;--mute:#5d6470;--line:#d5d9e0}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.4 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:110px}
 h1,h2,h3,.cond{font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif;font-stretch:condensed;font-weight:800;margin:0}
 header{background:var(--bg);padding:16px 18px 0;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line)}
@@ -14,8 +14,8 @@ nav button.on{color:var(--ink);font-weight:700;border-color:var(--ink)}
 main{padding:14px}.tab{display:none}.tab.on{display:block}
 .muted{color:var(--mute)}.plans{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
 .plan{display:flex;gap:10px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;text-align:left;font-size:15px;color:var(--ink)}
-.plan.c{grid-column:1/3}.plan .ic{flex:none;width:52px;height:52px;border-radius:50%;border:4px solid;display:grid;place-items:center;font:800 26px Arial}
-.plan.a .ic{color:var(--a)}.plan.b .ic{color:var(--b)}.plan.c .ic{color:var(--c)}
+.plan.c,.plan.t{grid-column:1/3}.plan .ic{flex:none;width:52px;height:52px;border-radius:50%;border:4px solid;display:grid;place-items:center;font:800 26px Arial}
+.plan.a .ic{color:var(--a)}.plan.b .ic{color:var(--b)}.plan.c .ic{color:var(--c)}.plan.t .ic{color:var(--t)}
 .plan b{font-size:22px;display:block}.plan.on.a{background:var(--a);color:#fff;border-color:var(--a)}.plan.on.b{background:var(--b);color:#fff;border-color:var(--b)}.plan.on.c{background:var(--c);color:#fff;border-color:var(--c)}.plan.on .ic{color:#fff}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 input,textarea,select{font:inherit;padding:11px;border:1.5px solid var(--line);border-radius:10px;background:#fff;min-height:48px;width:100%}
@@ -31,7 +31,7 @@ input,textarea,select{font:inherit;padding:11px;border:1.5px solid var(--line);b
 .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:6}
 .bar .save{font-family:"Arial Narrow",Arial;font-stretch:condensed;font-weight:800;font-size:24px;padding:12px 24px;border-radius:12px;border:0;background:var(--ink);color:#fff}.bar .save:disabled{background:#cfd3da;color:#6b717c}
 .hist summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center}.hist summary::-webkit-details-marker{display:none}
-.tag{color:#fff;font-weight:800;padding:4px 10px;border-radius:8px;font-size:15px}.ta{background:var(--a)}.tb{background:var(--b)}.tc{background:var(--c)}
+.tag{color:#fff;font-weight:800;padding:4px 10px;border-radius:8px;font-size:15px}.ta{background:var(--a)}.tb{background:var(--b)}.tc{background:var(--c)}.tt{background:var(--t)}
 .hx{padding:8px 0;border-top:1px solid #eee;font-size:15px}.scale{display:flex;gap:6px}.scale button{flex:1;min-height:48px;font-size:19px;border-radius:10px;border:1.5px solid var(--line);background:#fff}
 .scale button.on{background:var(--ink);color:#fff}label{display:block;font-weight:600;margin:12px 0 4px}
 .zone{background:#fff7e0;border:1px solid #e6c56b;border-radius:10px;padding:10px;font-size:15px}
@@ -45,6 +45,7 @@ input,textarea,select{font:inherit;padding:11px;border:1.5px solid var(--line);b
   <button class="plan a" data-p="A"><div class="ic">A</div><div><b>Plan A</b><span id="pa"></span></div></button>
   <button class="plan b" data-p="B"><div class="ic">B</div><div><b>Plan B</b><span id="pb"></span></div></button>
   <button class="plan c" data-p="C"><div class="ic">C</div><div><b>Plan C · Cardio</b>Bike, treadmill walk, walk, run</div></button>
+  <button class="plan t" data-p="T"><div class="ic">T</div><div><b>Out of Town</b>Hotel / no-gym: bodyweight + exercise bar</div></button>
  </div>
  <div class="row"><span class="cond muted">DATE</span><input type="date" id="wdate" style="flex:1"><button class="btn" id="today">Today</button></div>
  <div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn" id="clear">Clear entries</button></div>
@@ -91,10 +92,19 @@ const EX={
  row:{n:"Seated row",set:"Chest to pad, neutral handles.",cue:"Pull elbows back, squeeze blades. Stop short of full arm lockout on the return."},
  incline:{n:"Incline chest press",set:"Low incline, neutral grip if possible.",cue:"Don't flare elbows; stop short of lockout."},
  backext:{n:"Back extension",low:1,set:"Pad at hip crease.",cue:"Hinge at hips, flat back, stop at body-straight. Don't hyperextend."},
+ bwsquat:{n:"Bodyweight squat",low:1,set:"Feet shoulder-width; a chair behind you is optional.",cue:"Sit back to a comfortable depth (hip ≤90°), stand up slowly. Leave weight blank."},
+ barchest:{n:"Exercise bar – chest squeeze",set:"Bar at chest height.",cue:"Squeeze slowly, elbows slightly bent, never locked. Leave weight blank."},
+ barlow:{n:"Exercise bar – below waist (forearm/triceps)",set:"Bar below the waist.",cue:"Keep it light; stop if the elbow aches."},
+ pullapart:{n:"Exercise bar – back pull-apart",set:"Chest height.",cue:"Pull handles apart, squeeze shoulder blades."},
+ thigh:{n:"Thighmaster / inner thigh squeeze",low:1,set:"Seated, between knees.",cue:"Gentle squeeze; stop for any hip or groin pain."},
+ inclpush:{n:"Incline push-up (table/counter)",set:"Hands on a sturdy table or counter.",cue:"Body straight, stop short of elbow lockout, exhale pushing up."},
+ bridge:{n:"Glute bridge",low:1,set:"On floor or bed.",cue:"Squeeze glutes, lift hips, 2-sec hold."},
+ stepup:{n:"Step-up (low step)",low:1,set:"Low step or curb, hold a rail.",cue:"Drive through the whole foot; step down slowly."},
  legext:{n:"Leg extension",low:1,set:"Pad on lower shin. Light (~40 lb), short range.",cue:"Stop before the knee locks out. No hard snapping.",tip:"You felt this inside the knees. Go light with a shorter range. If you still feel it, skip it and tell your coach (swap: step-up to low bench)."}
 };
 const PLANS={A:{main:["legpress","chest","pulldown","legcurl","shpress","abduct","plank"],opt:["fly","calf","facepull","pallof","farmer"]},
- B:{main:["legpress","row","incline","backext","legext","calf"],opt:["facepull"]}};
+ B:{main:["legpress","row","incline","backext","legext","calf"],opt:["facepull"]},
+ T:{main:["bwsquat","barchest","inclpush","pullapart","thigh","plank"],opt:["barlow","bridge","stepup"]}};
 const CARDIO=[{id:"bike",n:"Bike",lv:"Level"},{id:"tread",n:"Treadmill walk",lv:"Speed (mph)"},{id:"walk",n:"Walk",lv:"Distance (mi)"},{id:"run",n:"Run",lv:"Distance (mi) or speed",warn:"Hip resurfacing: get your surgeon's OK before running. Start with short walk/jog intervals on a treadmill; stop for any hip or groin pain."}];
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const KEY="liftlog_v1";
@@ -106,13 +116,14 @@ function seed(){const W=(id,date,plan,entries)=>({id,date,plan,entries});const E
  W("s4","2026-10-07","C",[{ex:"tread",name:"Treadmill walk",cardio:{min:15,level:"2.7 mph",incline:"5",hr:""},note:""}])],
  checkins:[{id:"c1",date:"2026-10-05",weight:208,energy:"",nausea:"",appetite:"",hip:"",elbow:"",protein:"",note:"Starting weight"}]};}
 let DB;try{DB=JSON.parse(localStorage.getItem(KEY))}catch(e){}if(!DB||!DB.workouts){DB=seed();store();}
+if(!DB.workouts.some(w=>w.id==="t1017")){DB.workouts.push({id:"t1017",date:"2026-10-17",plan:"T",entries:[{ex:"barchest",name:"Exercise bar – chest squeeze",sets:[{w:"",r:12},{w:"",r:12},{w:"",r:12}],note:""},{ex:"barlow",name:"Exercise bar – below waist (forearm/triceps)",sets:[{w:"",r:12},{w:"",r:12},{w:"",r:12}],note:""},{ex:"thigh",name:"Thighmaster / inner thigh squeeze",sets:[{w:"",r:12},{w:"",r:12}],note:""},{ex:"inclpush",name:"Incline push-up (table/counter)",sets:[{w:"",r:12},{w:"",r:12}],note:""}]});store();}
 function store(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
 const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
 const fmt=d=>{const x=new Date(d+"T12:00");return x.toLocaleDateString("en-US",{weekday:"short",month:"numeric",day:"numeric"})};
 const fmtY=d=>{const x=new Date(d+"T12:00");return x.toLocaleDateString("en-US",{weekday:"short",month:"numeric",day:"numeric",year:"numeric"})};
 const sorted=()=>[...DB.workouts].sort((a,b)=>b.date.localeCompare(a.date)||(b.ts||0)-(a.ts||0)||b.id.localeCompare(a.id));
 function lastFor(ex){for(const w of sorted()){const e=w.entries.find(e=>e.ex===ex);if(e)return{w,e}}return null}
-const setsTxt=(e,ex)=>e.cardio?`${e.cardio.min} min${e.cardio.level?" · "+e.cardio.level:""}${e.cardio.incline?" · "+e.cardio.incline+"% incline":""}${e.cardio.hr?" · "+e.cardio.hr+" bpm":""}`:e.sets.map(s=>(EX[ex]||{}).u==="sec"||e.ex==="plank"?s.r+"s":`${s.w} × ${s.r}`).join(" · ");
+const setsTxt=(e,ex)=>e.cardio?`${e.cardio.min} min${e.cardio.level?" · "+e.cardio.level:""}${e.cardio.incline?" · "+e.cardio.incline+"% incline":""}${e.cardio.hr?" · "+e.cardio.hr+" bpm":""}`:e.sets.map(s=>(EX[ex]||{}).u==="sec"||e.ex==="plank"?s.r+"s":(s.w===""||s.w==null?`${s.r} reps`:`${s.w} × ${s.r}`)).join(" · ");
 function suggest(ex,l){const d=EX[ex];if(!l)return"First time: pick a weight you can lift 12 times with ~4 reps left (RPE 5-6).";const s=l.e.sets;
  if(d.u==="sec"){const m=Math.min(...s.map(x=>+x.r));return m>=30?"Hit 30 s — try toes, or add 5 s.":`Build toward 20-30 s. Try ${Math.min(30,m+3)} s each. Keep breathing.`}
  const reps=s.map(x=>+x.r),w=Math.max(...s.map(x=>+x.w||0));
@@ -120,8 +131,8 @@ function suggest(ex,l){const d=EX[ex];if(!l)return"First time: pick a weight you
  if(reps.some(r=>r<10)){const lw=+s[s.length-1].w||w;return`Stay at this weight until both sets reach 10.${reps.some(r=>r<8)?` Last time was heavy — consider ~${Math.round(lw*0.85/5)*5} lb.`:""}`}
  return`Same weight (${w} lb). Aim for 12 on both sets.`}
 let plan=null,draft={};
-function nextLift(){const l=sorted().find(w=>w.plan!=="C");return!l?"A":l.plan==="A"?"B":"A"}
-function renderTop(){const l=sorted().find(w=>w.plan!=="C"),n=nextLift();
+function nextLift(){const l=sorted().find(w=>w.plan==="A"||w.plan==="B");return!l?"A":l.plan==="A"?"B":"A"}
+function renderTop(){const l=sorted().find(w=>w.plan==="A"||w.plan==="B"),n=nextLift();
  $("#lastline").textContent=l?`Last workout: Plan ${l.plan}, ${fmt(l.date)}. Next lifting day: Plan ${n}.`:"Next lifting day: Plan A.";
  $("#pa").innerHTML=`${PLANS.A.main.length} exercises + optional${n==="A"?" · up next":""}`;$("#pb").innerHTML=`${PLANS.B.main.length} exercises + optional${n==="B"?" · up next":""}`;
  $$(".plan").forEach(b=>b.classList.toggle("on",b.dataset.p===plan));}
@@ -162,7 +173,7 @@ $("#save").onclick=()=>{const date=$("#wdate").value||today();const entries=[];
  if(plan==="C")CARDIO.forEach(c=>{if(filled(c.id)){const d=draft[c.id];entries.push({ex:c.id,name:c.n,cardio:{min:d.min,level:d.level,incline:d.incline,hr:d.hr},note:d.note})}});
  else PLANS[plan].main.concat(PLANS[plan].opt).forEach(id=>{if(filled(id)){const d=draft[id];entries.push({ex:id,name:EX[id].n,sets:(()=>{const l=lastFor(id);const ls=l&&l.e.sets||[];return d.sets.map((s,i)=>({s,i})).filter(o=>o.s.r!=="").map(({s,i})=>{let w=s.w;if(w===""){const p=ls[Math.min(i,ls.length-1)];w=p&&p.w!==""&&p.w!=null?p.w:""}return{w:w===""?"":+w,r:+s.r}})})(),note:d.note})}});
  DB.workouts.push({id:"w"+Date.now(),ts:Date.now(),date,plan,entries});store();draft={};plan=null;renderAll();alert("Workout saved 💪");scrollTo(0,0)};
-function renderHist(){const ws=sorted();$("#histlist").innerHTML=ws.length?ws.map(w=>`<details class="card hist"><summary><div><span class="tag t${w.plan.toLowerCase()}">${w.plan==="C"?"C · Cardio":"Plan "+w.plan}</span> <b>${fmtY(w.date)}</b></div><span class="muted">${w.entries.length} ▾</span></summary>
+function renderHist(){const ws=sorted();$("#histlist").innerHTML=ws.length?ws.map(w=>`<details class="card hist"><summary><div><span class="tag t${w.plan.toLowerCase()}">${w.plan==="C"?"C · Cardio":w.plan==="T"?"Out of Town":"Plan "+w.plan}</span> <b>${fmtY(w.date)}</b></div><span class="muted">${w.entries.length} ▾</span></summary>
  ${w.entries.map(e=>`<div class="hx"><b>${esc(e.name)}</b><br>${setsTxt(e,e.ex)}${e.note?`<br><i class="muted">${esc(e.note)}</i>`:""}</div>`).join("")}
  <button class="btn sm" data-del="${w.id}" style="margin-top:8px;color:var(--b)">Delete workout</button></details>`).join(""):'<p class="muted">No workouts yet.</p>'}
 $("#histlist").addEventListener("click",e=>{const id=e.target.dataset.del;if(id&&confirm("Delete this workout? This can't be undone.")){DB.workouts=DB.workouts.filter(w=>w.id!==id);store();renderAll()}});
@@ -181,7 +192,7 @@ function renderCI(){const L=cis();$("#cilist").innerHTML=L.map(c=>`<div class="c
 $("#cilist").addEventListener("click",e=>{const id=e.target.dataset.dc;if(id&&confirm("Delete this check-in?")){DB.checkins=DB.checkins.filter(c=>c.id!==id);store();renderCI()}});
 function summary(){const cut=new Date(Date.now()-7*864e5);const c=new Date(cut-cut.getTimezoneOffset()*6e4).toISOString().slice(0,10);
  const ws=sorted().filter(w=>w.date>=c).reverse();let t=`LIFT LOG summary (last 7 days)\n`;
- ws.forEach(w=>{t+=`\n${fmt(w.date)} — ${w.plan==="C"?"Plan C Cardio":"Plan "+w.plan}\n`;w.entries.forEach(e=>t+=`- ${e.name}: ${setsTxt(e,e.ex)}${e.note?" ("+e.note+")":""}\n`)});
+ ws.forEach(w=>{t+=`\n${fmt(w.date)} — ${w.plan==="C"?"Plan C Cardio":w.plan==="T"?"Out of Town":"Plan "+w.plan}\n`;w.entries.forEach(e=>t+=`- ${e.name}: ${setsTxt(e,e.ex)}${e.note?" ("+e.note+")":""}\n`)});
  if(!ws.length)t+="\nNo workouts in the last 7 days.\n";const l=cis()[0];if(l)t+=`\nLatest check-in ${fmt(l.date)}: ${ciTxt(l)}${l.note?" — "+l.note:""}\n`;return t}
 $("#copy").onclick=async()=>{const t=summary(),o=$("#copyout");o.value=t;try{await navigator.clipboard.writeText(t);$("#copy").textContent="Copied ✓ — paste into chat";o.style.display="block"}catch(e){o.style.display="block";o.focus();o.select();try{document.execCommand("copy")}catch(_){}$("#copy").textContent="Select text below and copy"}};
 $("#exp").onclick=()=>{const b=new Blob([JSON.stringify(DB,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`lift-log-backup-${today()}.json`;a.click()};
