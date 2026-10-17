@@ -61,7 +61,7 @@ input,textarea,select{font:inherit;padding:11px;border:1.5px solid var(--line);b
   <label>Medication</label><div class="row" id="medpick"><button class="btn on" data-m="Testosterone cypionate">Testosterone</button><button class="btn" data-m="Retatrutide">Retatrutide (GLP)</button></div>
   <label>Date &amp; time</label><input type="datetime-local" id="sdate">
   <label>Dose</label><input id="sdose" placeholder="e.g. 0.5 mL or 1 mg">
-  <label>Injection site</label><select id="ssite"><option value="">—</option><option>Left belly</option><option>Right belly</option><option>Left thigh</option><option>Right thigh</option><option>Left glute</option><option>Right glute</option><option>Left arm</option><option>Right arm</option></select>
+  <label>Injection site</label><select id="ssite"></select><div id="ssug" class="muted" style="margin-top:4px"></div>
   <label>Notes / side effects</label><input id="snote" placeholder="Optional">
   <button class="btn primary" id="ssave" style="margin-top:12px;width:100%">Save shot</button></div>
  <div id="slast"></div><div id="slist"></div>
@@ -212,14 +212,17 @@ $("#imp").onclick=()=>$("#impf").click();
 $("#impf").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const d=JSON.parse(t);if(!d.workouts||!d.checkins)throw 0;if(confirm("Replace current data with this backup?")){DB=d;store();renderAll()}}).catch(()=>alert("That file isn't a Lift Log backup."))};
 $$("nav button").forEach(b=>b.onclick=()=>{$$("nav button").forEach(x=>x.classList.toggle("on",x===b));$$(".tab").forEach(s=>s.classList.toggle("on",s.id===b.dataset.t));$("#bar").style.display=b.dataset.t==="workout"?"flex":"none";scrollTo(0,0)});
 let med="Testosterone cypionate";
-$("#medpick").onclick=e=>{const m=e.target.dataset.m;if(!m)return;med=m;$$("#medpick button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));const l=(DB.shots||[]).filter(x=>x.med===m).sort((a,b)=>b.dt.localeCompare(a.dt))[0];$("#sdose").value=l?l.dose:""};
+const SITES={"Retatrutide":["Left abdomen","Right abdomen","Left thigh","Right thigh"],"Testosterone cypionate":["Left glute","Right glute","Left thigh","Right thigh","Left abdomen","Right abdomen","Left arm","Right arm"]};
+function suggestSite(m){const l=(DB.shots||[]).filter(x=>x.med===m&&x.site).sort((a,b)=>b.dt.localeCompare(a.dt))[0];const list=SITES[m];if(!l)return list[0];const flip=l.site.startsWith("Left")?l.site.replace("Left","Right"):l.site.replace("Right","Left");return list.includes(flip)?flip:list[0]}
+function fillSites(){const sug=suggestSite(med);const l=(DB.shots||[]).filter(x=>x.med===med&&x.site).sort((a,b)=>b.dt.localeCompare(a.dt))[0];$("#ssite").innerHTML=SITES[med].map(o=>`<option${o===sug?" selected":""}>${o}</option>`).join("");$("#ssug").textContent=l?`Last: ${l.site}. Suggested today: ${sug}.`:`Suggested: ${sug}. Alternate sides each shot.`}
+$("#medpick").onclick=e=>{const m=e.target.dataset.m;if(!m)return;med=m;$$("#medpick button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));const l=(DB.shots||[]).filter(x=>x.med===m).sort((a,b)=>b.dt.localeCompare(a.dt))[0];$("#sdose").value=l?l.dose:"";fillSites()};
 const nowLocal=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)};
-$("#ssave").onclick=()=>{const dt=$("#sdate").value||nowLocal();DB.shots=DB.shots||[];DB.shots.push({id:"sh"+Date.now(),med,dt,dose:$("#sdose").value.trim(),site:$("#ssite").value,note:$("#snote").value.trim()});store();$("#snote").value="";$("#ssite").value="";$("#sdate").value="";renderShots();alert("Shot saved")};
+$("#ssave").onclick=()=>{const dt=$("#sdate").value||nowLocal();DB.shots=DB.shots||[];DB.shots.push({id:"sh"+Date.now(),med,dt,dose:$("#sdose").value.trim(),site:$("#ssite").value,note:$("#snote").value.trim()});store();$("#snote").value="";$("#sdate").value="";renderShots();fillSites();alert("Shot saved")};
 const fdt=dt=>{const d=new Date(dt);return d.toLocaleDateString(undefined,{weekday:"short",month:"numeric",day:"numeric"})+" "+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})};
 function renderShots(){const sh=(DB.shots||[]).slice().sort((a,b)=>b.dt.localeCompare(a.dt));const last=m=>sh.find(x=>x.med===m);const days=x=>Math.floor((Date.now()-new Date(x.dt))/864e5);
  $("#slast").innerHTML=`<div class="card"><h3>Last shots</h3>${["Testosterone cypionate","Retatrutide"].map(m=>{const l=last(m);return`<div style="margin:6px 0"><b>${m==="Retatrutide"?"Retatrutide":"Testosterone"}:</b> ${l?`${fdt(l.dt)} · ${esc(l.dose)||"dose not set"}${l.site?" · "+esc(l.site):""} <span class="muted">(${days(l)} days ago)</span>`:'<span class="muted">none logged</span>'}</div>`}).join("")}</div>`;
  $("#slist").innerHTML=sh.length?`<div class="card"><h3>Shot history</h3>${sh.map(x=>`<div style="border-top:1px solid var(--line);padding:8px 0"><b>${x.med==="Retatrutide"?"Retatrutide":"Testosterone"}</b> — ${fdt(x.dt)}<br>${esc(x.dose)||""}${x.site?" · "+esc(x.site):""}${x.note?`<br><i class="muted">${esc(x.note)}</i>`:""}<br><button class="btn" data-ds="${x.id}" style="margin-top:6px">Delete</button></div>`).join("")}</div>`:""}
 $("#slist").addEventListener("click",e=>{const id=e.target.dataset.ds;if(id&&confirm("Delete this shot entry?")){DB.shots=DB.shots.filter(x=>x.id!==id);store();renderShots()}});
-function renderAll(){renderTop();renderEx();renderHist();renderCI();renderShots()}
+function renderAll(){renderTop();renderEx();renderHist();renderCI();renderShots();fillSites()}
 $("#wdate").value=today();$("#cdate").value=today();renderAll();
 </script></body></html>
