@@ -148,7 +148,7 @@ function suggest(ex,l){const d=EX[ex];if(!l)return"First time: pick a weight you
  if(reps.every(r=>r>=12)){const inc=d.low?10:5;return`All sets hit 12 → add weight: try ${w+inc} lb (+${inc}).`}
  if(reps.some(r=>r<10)){const lw=+s[s.length-1].w||w;return`Stay at this weight until both sets reach 10.${reps.some(r=>r<8)?` Last time was heavy — consider ~${Math.round(lw*0.85/5)*5} lb.`:""}`}
  return`Same weight (${w} lb). Aim for 12 on both sets.`}
-let plan=null,draft={};
+let plan=null,draft={};const DK="liftlog_draft";function sd(){try{if(plan)localStorage.setItem(DK,JSON.stringify({plan,draft,date:$("#wdate").value}));else localStorage.removeItem(DK)}catch(e){}}
 function nextLift(){const l=sorted().find(w=>w.plan==="A"||w.plan==="B");return!l?"A":l.plan==="A"?"B":"A"}
 function renderTop(){const l=sorted().find(w=>w.plan==="A"||w.plan==="B"),n=nextLift();
  $("#lastline").textContent=l?`Last workout: Plan ${l.plan}, ${fmt(l.date)}. Next lifting day: Plan ${n}.`:"Next lifting day: Plan A.";
@@ -175,7 +175,7 @@ function renderEx(){const L=$("#exlist");if(!plan){L.innerHTML='<p class="muted"
  count()}
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const filled=id=>{const d=draft[id];if(!d)return 0;return d.sets?d.sets.some(s=>s.r!==""):d.min!==""};
-function count(){const ids=plan==="C"?CARDIO.map(c=>c.id):plan?PLANS[plan].main.concat(PLANS[plan].opt):[];const m=plan==="C"?Math.max(1,ids.filter(filled).length):plan?PLANS[plan].main.length:0;const n=ids.filter(filled).length;
+function count(){sd();const ids=plan==="C"?CARDIO.map(c=>c.id):plan?PLANS[plan].main.concat(PLANS[plan].opt):[];const m=plan==="C"?Math.max(1,ids.filter(filled).length):plan?PLANS[plan].main.length:0;const n=ids.filter(filled).length;
  $("#count").textContent=`${n} of ${m} exercises logged`;$("#save").disabled=!n}
 $("#exlist").addEventListener("input",e=>{const t=e.target,c=t.closest("[data-ex],[data-cx]");if(!c)return;const id=c.dataset.ex||c.dataset.cx,d=draft[id],f=t.dataset.f;
  if(t.dataset.i!=null)d.sets[+t.dataset.i][f]=t.value;else d[f]=t.value;count()});
@@ -230,5 +230,5 @@ function renderShots(){const sh=(DB.shots||[]).slice().sort((a,b)=>b.dt.localeCo
  $("#slist").innerHTML=sh.length?`<div class="card"><h3>Shot history</h3>${sh.map(x=>`<div style="border-top:1px solid var(--line);padding:8px 0"><b>${x.med==="Retatrutide"?"Retatrutide":"Testosterone"}</b> — ${fdt(x.dt)}<br>${esc(x.dose)||""}${x.site?" · "+esc(x.site):""}${x.note?`<br><i class="muted">${esc(x.note)}</i>`:""}<br><button class="btn" data-ds="${x.id}" style="margin-top:6px">Delete</button></div>`).join("")}</div>`:""}
 $("#slist").addEventListener("click",e=>{const id=e.target.dataset.ds;if(id&&confirm("Delete this shot entry?")){DB.shots=DB.shots.filter(x=>x.id!==id);store();renderShots()}});
 function renderAll(){renderTop();renderEx();renderHist();renderCI();renderShots();fillSites()}
-$("#wdate").value=today();$("#cdate").value=today();renderAll();
+$("#wdate").value=today();$("#cdate").value=today();try{const k=JSON.parse(localStorage.getItem(DK));if(k&&k.plan&&PLANS[k.plan]||k&&k.plan==="C"){plan=k.plan;draft=k.draft||{};if(k.date)$("#wdate").value=k.date}}catch(e){}renderAll();$("#wdate").addEventListener("change",sd);addEventListener("pagehide",sd);document.addEventListener("visibilitychange",sd);
 </script></body></html>
