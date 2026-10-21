@@ -45,7 +45,7 @@ input,textarea,select{font:inherit;padding:11px;border:1.5px solid var(--line);b
  <div class="plans">
   <button class="plan a" data-p="A"><div class="ic">A</div><div><b>Plan A</b><span id="pa"></span></div></button>
   <button class="plan b" data-p="B"><div class="ic">B</div><div><b>Plan B</b><span id="pb"></span></div></button>
-  <button class="plan c" data-p="C"><div class="ic">C</div><div><b>Plan C · Cardio</b>Bike, treadmill walk, walk, run</div></button>
+  <button class="plan c" data-p="C"><div class="ic">C</div><div><b>Plan C · Cardio</b>Bike, treadmill, elliptical, walk, run</div></button>
   <button class="plan m" data-p="M"><div class="ic">M</div><div><b>Morning Stretching</b>Bodyweight only, no weights or equipment</div></button>
   <button class="plan t" data-p="T"><div class="ic">T</div><div><b>Out of Town</b>Hotel / no-gym: bodyweight + exercise bar</div></button>
  </div>
@@ -122,7 +122,7 @@ const EX={
 const PLANS={A:{main:["legpress","chest","pulldown","legcurl","shpress","abduct","plank"],opt:["fly","farmer"]},
  B:{main:["legpress","row","incline","backext","legext","calf"],opt:["pallof","stepup"]},
  M:{main:["mreach","mgolf","mhip","msqreach"],opt:[]},T:{main:["bwsquat","barchest","inclpush","pullapart","thigh","plank"],opt:["barlow","bridge","stepup"]}};
-const CARDIO=[{id:"bike",n:"Bike",lv:"Level"},{id:"tread",n:"Treadmill walk",lv:"Speed (mph)"},{id:"walk",n:"Walk",lv:"Distance (mi)"},{id:"run",n:"Run",lv:"Distance (mi) or speed",warn:"Hip resurfacing: get your surgeon's OK before running. Start with short walk/jog intervals on a treadmill; stop for any hip or groin pain."}];
+const CARDIO=[{id:"bike",n:"Bike",lv:"Level"},{id:"tread",n:"Treadmill walk",lv:"Speed (mph)"},{id:"walk",n:"Walk",lv:"Distance (mi)"},{id:"ellip",n:"Elliptical",lv:"Resistance level"},{id:"run",n:"Run",lv:"Distance (mi) or speed",warn:"Hip resurfacing: get your surgeon's OK before running. Start with short walk/jog intervals on a treadmill; stop for any hip or groin pain."}];
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const KEY="liftlog_v1";
 function seed(){const W=(id,date,plan,entries)=>({id,date,plan,entries});const E=(ex,name,sets,note)=>({ex,name,sets:sets.map(([w,r])=>({w,r})),note:note||""});
