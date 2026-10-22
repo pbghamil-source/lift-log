@@ -99,7 +99,7 @@ const EX={
  fly:{n:"Delt/back fly",set:"Face the pad, handles at shoulder height, slight elbow bend.",cue:"Light! 12-15 controlled reps. Squeeze shoulder blades, no swinging."},
  calf:{n:"Seated calf raise",low:1,set:"Pad on lower thighs.",cue:"Full slow stretch at bottom, pause at top."},
  facepull:{n:"Cable face pull",set:"Rope at face height, palms facing in.",cue:"Pull toward eyes, elbows high. Light weight, no jerking."},
- pallof:{n:"Pallof press",set:"Stand sideways to cable at chest height.",cue:"Press straight out, hold 2 s, don't let torso twist. 10 each side."},
+ chop:{n:"Cable woodchop (high to low)",set:"Stand sideways, cable set above shoulder, light weight.",cue:"Pull down and across to the opposite hip, turning from the trunk, arms soft. No breath-holding. 10 each side."},abcrunch:{n:"Ab crunch machine",set:"Seated, light weight.",cue:"Curl the ribs toward the hips slowly, exhale on the crunch. Stop if the hip pinches."},suitcase:{n:"Suitcase carry",set:"One dumbbell in your right hand, then switch.",cue:"Walk tall without leaning, about 40 steps each side. Start light."},pallof:{n:"Pallof press",set:"Stand sideways to cable at chest height.",cue:"Press straight out, hold 2 s, don't let torso twist. 10 each side."},
  farmer:{n:"Farmer carry",low:1,set:"Light dumbbells, ~40 yards.",cue:"Walk tall, short steps. Reps = yards or steps."},
  row:{n:"Seated row",set:"Chest to pad, neutral handles.",cue:"Pull elbows back, squeeze blades. Stop short of full arm lockout on the return."},
  incline:{n:"Incline chest press",set:"Low incline, neutral grip if possible.",cue:"Don't flare elbows; stop short of lockout."},
@@ -120,7 +120,7 @@ const EX={
  legext:{n:"Leg extension",low:1,set:"Pad on lower shin. Light (~40 lb), short range.",cue:"Stop before the knee locks out. No hard snapping.",tip:"You felt this inside the knees. Go light with a shorter range. If you still feel it, skip it and tell your coach (swap: step-up to low bench)."}
 };
 const PLANS={A:{main:["legpress","chest","pulldown","legcurl","shpress","abduct","plank"],opt:["fly","farmer"]},
- B:{main:["legpress","row","incline","backext","legext","calf"],opt:["pallof","stepup"]},
+ B:{main:["legpress","row","incline","backext","legext","calf"],opt:["pallof","stepup","chop","abcrunch","suitcase"]},
  M:{main:["mreach","mgolf","mhip","msqreach"],opt:[]},T:{main:["bwsquat","barchest","inclpush","pullapart","thigh","plank"],opt:["barlow","bridge","stepup"]}};
 const CARDIO=[{id:"bike",n:"Bike",lv:"Level"},{id:"tread",n:"Treadmill walk",lv:"Speed (mph)"},{id:"walk",n:"Walk",lv:"Distance (mi)"},{id:"ellip",n:"Elliptical",lv:"Resistance level"},{id:"run",n:"Run",lv:"Distance (mi) or speed",warn:"Hip resurfacing: get your surgeon's OK before running. Start with short walk/jog intervals on a treadmill; stop for any hip or groin pain."}];
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
