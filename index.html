@@ -32,7 +32,7 @@ input,textarea,select{font:inherit;padding:11px;border:1.5px solid var(--line);b
 .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:6}
 .bar .save{font-family:"Arial Narrow",Arial;font-stretch:condensed;font-weight:800;font-size:24px;padding:12px 24px;border-radius:12px;border:0;background:var(--ink);color:#fff}.bar .save:disabled{background:#cfd3da;color:#6b717c}
 .hist summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center}.hist summary::-webkit-details-marker{display:none}
-.tag{color:#fff;font-weight:800;padding:4px 10px;border-radius:8px;font-size:15px}.ta{background:var(--a)}.tb{background:var(--b)}.tc{background:var(--c)}.tt{background:var(--t)}.tm{background:#7c5cbf}.plan.m .ic{color:#7c5cbf}
+.tag{color:#fff;font-weight:800;padding:4px 10px;border-radius:8px;font-size:15px}.ta{background:var(--a)}.tb{background:var(--b)}.tc{background:var(--c)}.tt{background:var(--t)}.tm{background:#7c5cbf}.tad{background:var(--a)}.tbd{background:var(--b)}.plan.m .ic{color:#7c5cbf}
 .hx{padding:8px 0;border-top:1px solid #eee;font-size:15px}.scale{display:flex;gap:6px}.scale button{flex:1;min-height:48px;font-size:19px;border-radius:10px;border:1.5px solid var(--line);background:#fff}
 .scale button.on{background:var(--ink);color:#fff}label{display:block;font-weight:600;margin:12px 0 4px}
 .zone{background:#fff7e0;border:1px solid #e6c56b;border-radius:10px;padding:10px;font-size:15px}
@@ -45,6 +45,8 @@ input,textarea,select{font:inherit;padding:11px;border:1.5px solid var(--line);b
  <div class="plans">
   <button class="plan a" data-p="A"><div class="ic">A</div><div><b>Plan A</b><span id="pa"></span></div></button>
   <button class="plan b" data-p="B"><div class="ic">B</div><div><b>Plan B</b><span id="pb"></span></div></button>
+  <button class="plan a" data-p="AD"><div class="ic">A</div><div><b>Plan A Dumbbell</b>Hotel dumbbells, 8 exercises</div></button>
+  <button class="plan b" data-p="BD"><div class="ic">B</div><div><b>Plan B Dumbbell</b>Hotel dumbbells, 7 exercises</div></button>
   <button class="plan c" data-p="C"><div class="ic">C</div><div><b>Plan C · Cardio</b>Bike, treadmill, elliptical, walk, run</div></button>
   <button class="plan m" data-p="M"><div class="ic">M</div><div><b>Morning Stretching</b>Bodyweight only, no weights or equipment</div></button>
   <button class="plan t" data-p="T"><div class="ic">T</div><div><b>Out of Town</b>Hotel / no-gym: bodyweight + exercise bar</div></button>
@@ -89,6 +91,22 @@ input,textarea,select{font:inherit;padding:11px;border:1.5px solid var(--line);b
 <div class="bar" id="bar"><div id="count">0 of 0 exercises logged</div><button class="save" id="save" disabled>SAVE WORKOUT</button></div>
 <script>
 const EX={
+ dgoblet:{n:"Box goblet squat (DB)",dw:30,dr:12,set:"Hold one dumbbell at your chest, box or bench behind you.",cue:"Sit back to the box, hip at about 90° or higher (left hip). Exhale standing up."},
+ dincpress:{n:"Neutral-grip incline DB press",dw:25,dr:12,set:"Low incline bench, palms facing each other.",cue:"Stop short of elbow lockout. Exhale on the press."},
+ dcsrow:{n:"Chest-supported DB row",dw:25,dr:11,set:"Chest on incline bench, neutral grip.",cue:"Pull elbows back, squeeze shoulder blades, slow lower without locking elbows."},
+ drdl:{n:"Short-range DB Romanian deadlift",dw:25,dr:12,set:"Dumbbells in front of thighs, soft knees.",cue:"Hinge only to mid-thigh/knee, hip at about 90° or less flexion. Flat back, exhale standing up."},
+ dshpress:{n:"Seated neutral-grip DB shoulder press",dw:20,dr:12,set:"Seated with back support, palms facing in.",cue:"Stop short of lockout. Ribs down, no arching."},
+ drear:{n:"Incline rear delt raise",dw:10,dr:12,set:"Chest on incline bench, light dumbbells.",cue:"Raise arms out wide with soft elbows, squeeze shoulder blades. Light and slow."},
+ dsuitcase:{n:"Suitcase carry (DB, timed)",u:"sec",dw:30,dr:30,set:"One dumbbell in one hand, then switch.",cue:"About 30 s per side. Walk tall without leaning. Enter seconds; note the weight."},
+ dplank:{n:"Bench plank",u:"sec",dr:30,set:"Hands or forearms on a bench, not the floor.",cue:"Straight line head to heels, 25-30 s. Keep breathing, no breath-holding."},
+ dsumo:{n:"Short-range DB sumo squat",dw:30,dr:12,set:"Wide stance, one dumbbell hanging between your legs.",cue:"Short range, hip stays above 90°. Exhale standing up."},
+ dsarow:{n:"Single-arm DB row (hand on bench)",dw:30,dr:12,set:"One hand on bench, neutral grip.",cue:"Pull elbow toward hip, slow lower without locking the elbow. 10-12 each side."},
+ dflatpress:{n:"Flat bench neutral-grip DB press",dw:25,dr:12,set:"Flat bench, palms facing each other.",cue:"No elbow lockout. Exhale on the press."},
+ dbridge:{n:"Bench hip bridge (DB on hips)",dw:30,dr:12,set:"Shoulders on bench, feet on floor, dumbbell on hips.",cue:"Short range, squeeze glutes at the top. Don't arch the low back."},
+ dlunge:{n:"Bench-supported split-stance mini lunge",low:1,dr:10,set:"Hold the bench for balance; bodyweight to 15 lb.",cue:"Short, slow range. Skip if the knee or left hip complains. 10-12 each side."},
+ dcalf:{n:"Standing single-DB calf raise",dw:25,dr:15,set:"One hand on the wall, dumbbell in the other.",cue:"Slow up, pause, slow down. 15 reps."},
+ dmarch:{n:"Offset single-arm DB march",u:"sec",dw:25,dr:30,set:"One dumbbell at your side, stand tall.",cue:"March in place 30 s per side without leaning. Enter seconds; note the weight."},
+
  legpress:{n:"Leg press",low:1,set:"Seat so knees bend ~90°, feet shoulder-width mid-platform. Hip: stop before knees come toward chest.",cue:"Push through the whole foot, knees track over toes. Don't bounce or lock knees hard."},
  chest:{n:"Chest press machine (neutral grip)",set:"Handles at mid-chest, neutral grip.",cue:"Shoulder blades back and down, stop ~10° short of lockout (elbow). Don't flare elbows or shrug."},
  pulldown:{n:"Lat pulldown",set:"Thigh pad snug; neutral handle if available.",cue:"Lead with elbows to upper chest. No yanking or leaning way back."},
@@ -121,7 +139,10 @@ const EX={
 };
 const PLANS={A:{main:["legpress","chest","pulldown","legcurl","shpress","abduct","plank"],opt:["fly","farmer","pallof"]},
  B:{main:["legpress","row","incline","backext","legext","calf"],opt:["pallof","stepup","chop","abcrunch","suitcase"]},
- M:{main:["mreach","mgolf","mhip","msqreach"],opt:[]},T:{main:["bwsquat","barchest","inclpush","pullapart","thigh","plank"],opt:["barlow","bridge","stepup"]}};
+ M:{main:["mreach","mgolf","mhip","msqreach"],opt:[]},T:{main:["bwsquat","barchest","inclpush","pullapart","thigh","plank"],opt:["barlow","bridge","stepup"]},
+ AD:{main:["dgoblet","dincpress","dcsrow","drdl","dshpress","drear","dsuitcase","dplank"],opt:[]},
+ BD:{main:["dsumo","dsarow","dflatpress","dbridge","dlunge","dcalf","dmarch"],opt:[]}};
+const PN=p=>p==="C"?"Plan C Cardio":p==="T"?"Out of Town":p==="M"?"Morning Stretching":p==="AD"?"Plan A Dumbbell":p==="BD"?"Plan B Dumbbell":"Plan "+p;
 const CARDIO=[{id:"bike",n:"Bike",lv:"Level"},{id:"tread",n:"Treadmill walk",lv:"Speed (mph)"},{id:"walk",n:"Walk",lv:"Distance (mi)"},{id:"ellip",n:"Elliptical",lv:"Resistance level"},{id:"run",n:"Run",lv:"Distance (mi) or speed",warn:"Hip resurfacing: get your surgeon's OK before running. Start with short walk/jog intervals on a treadmill; stop for any hip or groin pain."}];
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const KEY="liftlog_v1";
@@ -155,7 +176,7 @@ function renderTop(){const l=sorted().find(w=>w.plan==="A"||w.plan==="B"),n=next
  $("#pa").innerHTML=`${PLANS.A.main.length} exercises + optional${n==="A"?" · up next":""}`;$("#pb").innerHTML=`${PLANS.B.main.length} exercises + optional${n==="B"?" · up next":""}`;
  $$(".plan").forEach(b=>b.classList.toggle("on",b.dataset.p===plan));}
 function exCard(id,opt){const d=EX[id],l=lastFor(id),dr=draft[id]||(draft[id]={sets:[{w:"",r:""},{w:"",r:""}],note:""});
- const ph=i=>l&&l.e.sets?l.e.sets[Math.min(i,l.e.sets.length-1)]:{w:"",r:""};const sec=d.u==="sec";
+ const ph=i=>l&&l.e.sets?l.e.sets[Math.min(i,l.e.sets.length-1)]:{w:d.dw??"",r:d.dr??""};const sec=d.u==="sec";
  return`<div class="card" data-ex="${id}"><h3>${d.n}${opt?'<span class="opt">optional</span>':""}</h3>
  <div class="muted" style="font-size:15px">${l?`Last (${fmt(l.w.date)}): ${setsTxt(l.e,id)}${l.e.note?" — "+esc(l.e.note):""}`:"No log yet"} · Plan 2 × ${sec?"20-30 s":"10-12"}</div>
  ${d.tip?`<div class="warn">${d.tip}</div>`:""}<div class="sug">${suggest(id,l)}</div>
@@ -171,7 +192,7 @@ function cardioCard(c){const l=lastFor(c.id),dr=draft[c.id]||(draft[c.id]={min:"
  <input data-f="note" placeholder="Note" value="${esc(dr.note)}"></div>`}
 function renderEx(){const L=$("#exlist");if(!plan){L.innerHTML='<p class="muted">Pick a plan above to start logging.</p>';count();return}
  if(plan==="C"){L.innerHTML=`<div class="zone" style="margin-top:12px"><b>Zone 2 guide: 95-111 bpm</b> — you can talk in full sentences. Moderate 111-127. Rise slowly off the bike; stop for dizziness or chest pain.</div>`+CARDIO.map(cardioCard).join("")}
- else{const p=PLANS[plan];L.innerHTML=p.main.map(i=>exCard(i)).join("")+`<h2 style="margin:18px 0 0">Optional — only if feeling strong</h2>`+p.opt.map(i=>exCard(i,1)).join("")+`<div class="warn">Exhale on effort, never hold your breath. Stop for chest pain, dizziness, or sharp hip/elbow pain.</div>`}
+ else{const p=PLANS[plan];L.innerHTML=p.main.map(i=>exCard(i)).join("")+(p.opt.length?`<h2 style="margin:18px 0 0">Optional — only if feeling strong</h2>`+p.opt.map(i=>exCard(i,1)).join(""):"")+`<div class="warn">Exhale on effort, never hold your breath. Stop for chest pain, dizziness, or sharp hip/elbow pain.</div>`}
  count()}
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const filled=id=>{const d=draft[id];if(!d)return 0;return d.sets?d.sets.some(s=>s.r!==""):d.min!==""};
@@ -189,9 +210,9 @@ $("#today").onclick=()=>$("#wdate").value=today();
 $("#clear").onclick=()=>{if(confirm("Clear all entries on this screen?")){draft={};renderEx()}};
 $("#save").onclick=()=>{const date=$("#wdate").value||today();const entries=[];
  if(plan==="C")CARDIO.forEach(c=>{if(filled(c.id)){const d=draft[c.id];entries.push({ex:c.id,name:c.n,cardio:{min:d.min,level:d.level,incline:d.incline,hr:d.hr},note:d.note})}});
- else PLANS[plan].main.concat(PLANS[plan].opt).forEach(id=>{if(filled(id)){const d=draft[id];entries.push({ex:id,name:EX[id].n,sets:(()=>{const l=lastFor(id);const ls=l&&l.e.sets||[];return d.sets.map((s,i)=>({s,i})).filter(o=>o.s.r!=="").map(({s,i})=>{let w=s.w;if(w===""){const p=ls[Math.min(i,ls.length-1)];w=p&&p.w!==""&&p.w!=null?p.w:""}return{w:w===""?"":+w,r:+s.r}})})(),note:d.note})}});
+ else PLANS[plan].main.concat(PLANS[plan].opt).forEach(id=>{if(filled(id)){const d=draft[id];entries.push({ex:id,name:EX[id].n,sets:(()=>{const l=lastFor(id);const ls=l&&l.e.sets||[];return d.sets.map((s,i)=>({s,i})).filter(o=>o.s.r!=="").map(({s,i})=>{let w=s.w;if(w===""){const p=ls[Math.min(i,ls.length-1)];w=p&&p.w!==""&&p.w!=null?p.w:(EX[id].dw??"")}return{w:w===""?"":+w,r:+s.r}})})(),note:d.note})}});
  DB.workouts.push({id:"w"+Date.now(),ts:Date.now(),date,plan,entries});store();draft={};plan=null;renderAll();alert("Workout saved 💪");scrollTo(0,0)};
-function renderHist(){const ws=sorted();$("#histlist").innerHTML=ws.length?ws.map(w=>`<details class="card hist"><summary><div><span class="tag t${w.plan.toLowerCase()}">${w.plan==="C"?"C · Cardio":w.plan==="T"?"Out of Town":w.plan==="M"?"Morning Stretching":"Plan "+w.plan}</span> <b>${fmtY(w.date)}</b></div><span class="muted">${w.entries.length} ▾</span></summary>
+function renderHist(){const ws=sorted();$("#histlist").innerHTML=ws.length?ws.map(w=>`<details class="card hist"><summary><div><span class="tag t${w.plan.toLowerCase()}">${w.plan==="C"?"C · Cardio":PN(w.plan)}</span> <b>${fmtY(w.date)}</b></div><span class="muted">${w.entries.length} ▾</span></summary>
  ${w.entries.map(e=>`<div class="hx"><b>${esc(e.name)}</b><br>${setsTxt(e,e.ex)}${e.note?`<br><i class="muted">${esc(e.note)}</i>`:""}</div>`).join("")}
  <button class="btn sm" data-del="${w.id}" style="margin-top:8px;color:var(--b)">Delete workout</button></details>`).join(""):'<p class="muted">No workouts yet.</p>'}
 $("#histlist").addEventListener("click",e=>{const id=e.target.dataset.del;if(id&&confirm("Delete this workout? This can't be undone.")){DB.workouts=DB.workouts.filter(w=>w.id!==id);store();renderAll()}});
@@ -210,7 +231,7 @@ function renderCI(){const L=cis();$("#cilist").innerHTML=L.map(c=>`<div class="c
 $("#cilist").addEventListener("click",e=>{const id=e.target.dataset.dc;if(id&&confirm("Delete this check-in?")){DB.checkins=DB.checkins.filter(c=>c.id!==id);store();renderCI()}});
 function summary(){const cut=new Date(Date.now()-7*864e5);const c=new Date(cut-cut.getTimezoneOffset()*6e4).toISOString().slice(0,10);
  const ws=sorted().filter(w=>w.date>=c).reverse();let t=`LIFT LOG summary (last 7 days)\n`;
- ws.forEach(w=>{t+=`\n${fmt(w.date)} — ${w.plan==="C"?"Plan C Cardio":w.plan==="T"?"Out of Town":w.plan==="M"?"Morning Stretching":"Plan "+w.plan}\n`;w.entries.forEach(e=>t+=`- ${e.name}: ${setsTxt(e,e.ex)}${e.note?" ("+e.note+")":""}\n`)});
+ ws.forEach(w=>{t+=`\n${fmt(w.date)} — ${PN(w.plan)}\n`;w.entries.forEach(e=>t+=`- ${e.name}: ${setsTxt(e,e.ex)}${e.note?" ("+e.note+")":""}\n`)});
  if(!ws.length)t+="\nNo workouts in the last 7 days.\n";const l=cis()[0];if(l)t+=`\nLatest check-in ${fmt(l.date)}: ${ciTxt(l)}${l.note?" — "+l.note:""}\n`;return t}
 $("#copy").onclick=async()=>{const t=summary(),o=$("#copyout");o.value=t;try{await navigator.clipboard.writeText(t);$("#copy").textContent="Copied ✓ — paste into chat";o.style.display="block"}catch(e){o.style.display="block";o.focus();o.select();try{document.execCommand("copy")}catch(_){}$("#copy").textContent="Select text below and copy"}};
 $("#exp").onclick=()=>{const b=new Blob([JSON.stringify(DB,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`lift-log-backup-${today()}.json`;a.click()};
